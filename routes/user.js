@@ -73,7 +73,7 @@ router.post('/login', (req, res) => {
                 .then(isMatch => {
                     if(isMatch) {
 
-                        const payload = {id: user._id, name: user.username, email: user.email, avatar: user.avatar};
+                        const payload = {id: user._id, name: user.local.username, email: user.local.email, avatar: user.local.avatar};
                         jwt.sign(
                             payload,
                             process.env.SECRET_KEY,
@@ -108,6 +108,19 @@ router.post('/login', (req, res) => {
 // @access Public
 router.get('/google', passport.authenticate("googleToken", {session: false}), (req, res) => {
 
+    const payload = {id: req.user._id, name: req.user.google.name, email: req.user.google.email, avatar: req.user.google.avatar};
+
+    jwt.sign(
+        payload,
+        process.env.SECRET_KEY,
+        {expiresIn: 36000},
+        (err, token) => {
+            res.json({
+                success : true,
+                tokenInfo: "Bearer " + token
+            })
+        }
+    )
 });
 
 // 페이스북 로그인.
@@ -115,7 +128,21 @@ router.get('/google', passport.authenticate("googleToken", {session: false}), (r
 // desc facebook login
 // @access public
 router.get('/facebook', passport.authenticate("facebookToken", {session: false}), (req, res) => {
+    console.log(req.user);
 
+    const payload = {id: req._id, name: req.user.facebook.name, email: req.user.facebook.email, avatar: req.user.facebook.avatar};
+
+    jwt.sign(
+        payload,
+        process.env.SECRET_KEY,
+        {expiresIn: 36000},
+        (err, token) => {
+            res.json({
+                success: true,
+                tokenInfo: "Bearer " + token
+            })
+        }
+    )
 });
 
 
@@ -125,12 +152,7 @@ router.get('/facebook', passport.authenticate("facebookToken", {session: false})
 // @access Private
 router.get('/', checkAuth, (req, res) => {
     res.json({
-        userInfo : {
-            id: req.user.id,
-            name: req.user.username,
-            email: req.user.email,
-            avatar: req.user.avatar
-        }
+        userInfo: req.user
     });
 });
 

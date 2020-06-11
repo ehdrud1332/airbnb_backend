@@ -32,19 +32,52 @@ module.exports = passport => {
         clientSecret: "X9gBpm5WnPWEXk5WDvEo5Fy2"
     }, async (accessToken, refreshToken, profile, cb) => {
 
-        console.log("accessToken", accessToken);
-        console.log("refreshToken", refreshToken);
-        console.log("profile", profile);
+        try {
+            const existingUser = await userModel.findOne({"google.id":profile.id});
+            if(existingUser) {
+                return cb(null, existingUser)
+            }
+            const newUser = new userModel({
+                method: 'google',
+                google: {
+                    id: profile.id,
+                    name: profile.displayName,
+                    email: profile.emails[0].value,
+                    avatar: profile.photos[0].value
+                }
+            })
+            await newUser.save();
+            cb(null, newUser);
+        } catch(error) {
+            cb(error, false, error.message);
+        }
+
     }));
 
-    passport.use('facebookToen', new FacebooktokenStrategy({
+    passport.use('facebookToken', new FacebooktokenStrategy({
 
         clientID: "840845056395272",
         clientSecret: "5219457a0f6e9787f351ef2a37fd67fa"
     }, async (accessToken, refreshToken, profile, cb) => {
 
-        console.log("accessToken", accessToken);
-        console.log("refreshToken", refreshToken);
-        console.log("profile", profile);
+        try {
+            const existingUser = await userModel.findOne({"facebook.id" : profile.id});
+            if(existingUser) {
+                return cb(null, existingUser)
+            }
+                const newUser =new userModel({
+                    method: 'facebook',
+                    facebook: {
+                        id: profile.id,
+                        name: profile.displayName,
+                        email: profile.emails[0].value,
+                        avatar: profile.photos[0].value
+                    }
+                });
+                await newUser.save();
+                cb(null, newUser);
+        } catch (error){
+            cb(error, false, error.message)
+        }
     }))
 }

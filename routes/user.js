@@ -17,7 +17,7 @@ router.post('/signup', (req, res) => {
     const { username, email, password } = req.body;
 
     userModel
-        .findOne({email})
+        .findOne({"local.email" : email})
         .then(user => {
             if(user) {
                 return res.json({
@@ -26,7 +26,12 @@ router.post('/signup', (req, res) => {
             }
 
             const newUser = new userModel({
-                username, email, password
+                method: 'local',
+                local: {
+                    username: user,
+                    email: email,
+                    password: password
+                }
             });
 
             newUser
@@ -97,6 +102,10 @@ router.post('/login', (req, res) => {
 
 });
 
+// 구글 로그인
+
+
+
 //회원 정보
 // @route GET http://localhost:2323/user
 // @desc Current user
@@ -126,10 +135,20 @@ router.patch('/', (req, res) => {
 // @route GET http://localhost:2323/user
 // @desc user delete
 // @access Private
-router.delete('/', (req, res) => {
-    res.json({
-        msg: "회원탈퇴."
-    })
+router.delete('/', checkAuth, (req, res) => {
+
+    userModel
+        .findByIdAndDelete(req.user.id)
+        .then(result => {
+            res.json({
+                msg: "계정이 삭제가 완료되었습니다."
+            });
+        })
+        .catch(err => {
+            res.json({
+                error: err
+            })
+        })
 })
 
 module.exports = router;

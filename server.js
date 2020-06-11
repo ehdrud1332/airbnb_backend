@@ -8,14 +8,8 @@ const dotEnv = require('dotenv');
 dotEnv.config();
 const userRoutes = require('./routes/user');
 
-
-
-mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
-    .then(() => console.log("mongoDB conneted"))
-    .catch(err => console.log(err.message))
+// db 커넥션
+require('./db');
 
 
 app.use(morgan('dev'));

@@ -4,22 +4,62 @@ const bcrypt =  require('bcryptjs');
 
 const userSchema = mongoose.Schema(
     {
-        username: {
-           type: String,
-           required: true
-        },
-        email: {
+        method : {
             type: String,
+            enum: ['local', 'google', 'facebook'],
             required: true
         },
-        password: {
+        role: {
             type: String,
-            required: true
+            enum: ['user', 'admin'],
+            default: 'user'
         },
-        avatar: {
-            type: String
-        }
 
+        local : {
+            name: {
+               type: String,
+                },
+            email: {
+                type: String,
+                lowercase: true
+            },
+            password: {
+                type: String,
+            },
+            avatar: {
+                type: String
+            }
+        },
+         google : {
+            name: {
+               type: String,
+                },
+            email: {
+                type: String,
+                lowercase: true
+            },
+            password: {
+                type: String,
+            },
+            avatar: {
+                type: String
+            }
+        },
+         facebook : {
+            name: {
+               type: String,
+                },
+            email: {
+                type: String,
+                lowercase: true
+            },
+            password: {
+                type: String,
+            },
+            avatar: {
+                type: String
+            }
+        }
     },
     {
         timestamps: true
@@ -29,18 +69,22 @@ const userSchema = mongoose.Schema(
 userSchema.pre("save", async function (next) {
     try {
         console.log('enter')
-        const avatar = await gravatar.url(this.email, {
+        if (this.method !== 'local') {
+            next();
+        }
+
+        const avatar = await gravatar.url(this.loacl.email, {
             s: '200',
             r: 'pg',
             d: 'mm'
         });
-        this.avatar = avatar;
+        this.local.avatar = avatar;
 
        const salt = await bcrypt.genSalt(10);
        // bcrypt.hash : hash로 변환된 코드를 받을 수 있다.
-       const passwordHash = await bcrypt.hash(this.password, salt);
+       const passwordHash = await bcrypt.hash(this.local.password, salt);
 
-       this.password = passwordHash;
+       this.local.password = passwordHash;
        console.log('exited');
        next();
         } catch {

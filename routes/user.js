@@ -4,6 +4,9 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken');
 
 const userModel = require('../model/user');
+const passport = require('passport');
+
+const checkAuth = passport.authenticate('jwt', {session: false});
 
 // 회원가입
 // @route POST http://localhost:2323/user/signup
@@ -96,11 +99,16 @@ router.post('/login', (req, res) => {
 
 //회원 정보
 // @route GET http://localhost:2323/user
-// @desc user get all
+// @desc Current user
 // @access Private
-router.get('/', (req, res) => {
+router.get('/', checkAuth, (req, res) => {
     res.json({
-        msg: "정보 불러오기 성"
+        userInfo : {
+            id: req.user.id,
+            name: req.user.username,
+            email: req.user.email,
+            avatar: req.user.avatar
+        }
     });
 });
 

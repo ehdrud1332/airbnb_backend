@@ -3,9 +3,11 @@ const app = express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const passport = require('passport')
 const dotEnv = require('dotenv');
 dotEnv.config();
 const userRoutes = require('./routes/user');
+
 
 
 mongoose.connect(process.env.MONGO_URI, {
@@ -25,6 +27,9 @@ app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, HEAD, OPTIONS");
     next();
 });
+app.use(passport.initialize());
+require('./config/password')(passport);
+
 
 app.use(async function(err, req, res, next) {
     console.error(err.message);

@@ -43,9 +43,9 @@ userSchema.pre("save", async function (next) {
        this.password = passwordHash;
        console.log('exited');
        next();
-    } catch {
-        next(error);
-    }
-}
+        } catch {
+            next(error);
+        }
+});
 
-module.exports = mongoose.model("user, userSchema");
+module.exports = mongoose.model("user", userSchema);

@@ -1,14 +1,44 @@
 const express = require('express');
 const router = express.Router();
 
+const userModel = require('../model/user');
+
 // 회원가입
 // @route POST http://localhost:2323/user/signup
 // @desc user signup
 // @access Public
 router.post('/signup', (req, res) => {
-    res.json({
-        msg: "회원가입 성공."
-    });
+
+    const { username, email, password } = req.body;
+
+    userModel
+        .findOne({email})
+        .then(user => {
+            if(user) {
+                return res.json({
+                    msg: "다른 이메일로 부탁드립니다."
+                });
+            }
+
+            const newUser = new userModel({
+                username, email, password
+            });
+
+            newUser
+                .save()
+                .then(user => {
+                    res.json({
+                        mag: "회원가입 되었습니다.",
+                        userInfo : user
+                    });
+                });
+        })
+        .catch(err => {
+            res.json({
+                error: err
+            });
+        });
+
 });
 
 // 로그인

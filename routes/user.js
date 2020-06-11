@@ -102,8 +102,21 @@ router.post('/login', (req, res) => {
 
 });
 
-// 구글 로그인
+// 구글 로그인.
+// @route GET http://localhost:2323/user/google
+// @desc google login
+// @access Public
+router.get('/google', passport.authenticate("googleToken", {session: false}), (req, res) => {
 
+});
+
+// 페이스북 로그인.
+// @route GEt http://localhost:2323/user/facebook
+// desc facebook login
+// @access public
+router.get('/facebook', passport.authenticate("facebookToken", {session: false}), (req, res) => {
+
+});
 
 
 //회원 정보

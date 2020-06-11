@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken');
 
 const userModel = require('../model/user');
 
@@ -46,9 +48,50 @@ router.post('/signup', (req, res) => {
 // @desc user login
 // @access Public
 router.post('/login', (req, res) => {
-    res.json({
-        msg: "로그인성공."
-    });
+
+    const {email, password} = req.body;
+
+    userModel
+        .findOne({email})
+        .then(user => {
+            if(!user) {
+                return res.json({
+                    msg: "fount not email"
+                })
+            }
+
+            bcrypt
+                .compare(password, user.password)
+                .then(isMatch => {
+                    if(isMatch) {
+
+                        const payload = {id: user._id, name: user.username, email: user.email, avatar: user.avatar};
+                        jwt.sign(
+                            payload,
+                            process.env.SECRET_KEY,
+                            {expiresIn: 36000},
+                            (err, token) => {
+
+                                res.json({
+                                    success: true,
+                                    token: "Bearer " + token
+                                });
+                            }
+                        );
+
+                    } else {
+                        res.json({
+                            msg: "패스워드가 다릅니다."
+                        });
+                    }
+                })
+        })
+        .catch(err => {
+            res.json({
+                error: err
+            })
+        })
+
 });
 
 //회원 정보

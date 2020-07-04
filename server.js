@@ -7,11 +7,12 @@ const passport = require('passport')
 const dotEnv = require('dotenv');
 dotEnv.config();
 const userRoutes = require('./routes/user');
+const roomsRoute = require('./routes/rooms');
 
 // db 커넥션
 require('./db');
 
-
+app.use('/uplaod/', express.static('upload'));
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}))
@@ -33,6 +34,8 @@ app.use(async function(err, req, res, next) {
     next();
 });
 app.use('/user', userRoutes);
+app.use('/rooms', roomsRoute)
+
 
 const port = process.env.PORT
 

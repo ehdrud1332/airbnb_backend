@@ -14,11 +14,13 @@ const checkAuth = passport.authenticate('jwt', {session: false});
 // @access Public
 router.post('/signup', (req, res) => {
 
-    const { username, email, password } = req.body;
-
+    const { firstName, lastName, email, password } = req.body;
+//     console.log(req.body)
     userModel
-        .findOne({"local.email" : email})
+        .findOne({email})
         .then(user => {
+
+            console.log(user)
             if(user) {
                 return res.json({
                     msg: "다른 이메일로 부탁드립니다."
@@ -26,12 +28,7 @@ router.post('/signup', (req, res) => {
             }
 
             const newUser = new userModel({
-                method: 'local',
-                local: {
-                    username: user,
-                    email: email,
-                    password: password
-                }
+               firstName, lastName, email, password
             });
 
             newUser
@@ -73,7 +70,7 @@ router.post('/login', (req, res) => {
                 .then(isMatch => {
                     if(isMatch) {
 
-                        const payload = {id: user._id, name: user.local.username, email: user.local.email, avatar: user.local.avatar};
+                        const payload = {id: user._id, name: user.username, email: user.email, avatar: user.avatar};
                         jwt.sign(
                             payload,
                             process.env.SECRET_KEY,

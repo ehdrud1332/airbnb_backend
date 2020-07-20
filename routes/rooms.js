@@ -32,9 +32,34 @@ const upload = multer({
 });
 
 
+router.get('/total', (req, res) => {
 
+    roomsModel
+        .find()
+        .then(docs => {
+            const response = {
+                // count: docs.length,
+                results : docs.map(doc => {
+                    return{
+                        id : doc._id,
+                        name: doc.name,
+                        price: doc.price,
+                        isFav: doc.isFav,
+                        isSuperHost: doc.isSuperHost,
+                        photos: doc.photos
+                    }
+                })
+            }
+            res.json(docs)
+        })
+        .catch(err => {
+            res.json({
+                msg: err.message
+            })
+        })
+})
 
-// @route POST http://localhost:2323/rooms
+// @route POST http://localhost:2323/rooms/roompost
 // @desc room Posting
 // @access private 'admin'
 router.post('/roompost', upload.single('photos'), (req, res) => {

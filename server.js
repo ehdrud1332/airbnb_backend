@@ -34,7 +34,7 @@ app.use(async function(err, req, res, next) {
     next();
 });
 app.use('/user', userRoutes);
-app.use('/rooms', roomsRoute)
+app.use('/rooms', roomsRoute);
 
 
 const port = process.env.PORT

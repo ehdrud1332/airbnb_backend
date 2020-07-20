@@ -38,7 +38,7 @@ router.post('/signup', (req, res) => {
                         mag: "회원가입 되었습니다.",
                         userInfo : user
                     });
-                });
+                });:
         })
         .catch(err => {
             res.json({
